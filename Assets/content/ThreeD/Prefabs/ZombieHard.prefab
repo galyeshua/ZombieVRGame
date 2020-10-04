@@ -969,7 +969,6 @@ GameObject:
   - component: {fileID: 1254187548308185732}
   - component: {fileID: -2595685793953612569}
   - component: {fileID: -7333748234053081553}
-  - component: {fileID: 1520993444806431713}
   m_Layer: 0
   m_Name: ZombieHard
   m_TagString: Untagged
@@ -1033,7 +1032,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f11aaf245263ac4ba426c886d359400, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_speed: 0.01
+  m_speed: 0.004
   m_lifes: 100
   m_hitPower: 7
   m_ZombieController: {fileID: 9125612140780351580}
@@ -1432,7 +1431,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9125612139519432927}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: -1372625422
   m_Radius: 1.14
   m_Speed: 3.5
@@ -1447,22 +1446,6 @@ NavMeshAgent:
   m_BaseOffset: 4.53
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!208 &1520993444806431713
-NavMeshObstacle:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9125612139519432927}
-  m_Enabled: 0
-  serializedVersion: 3
-  m_Shape: 1
-  m_Extents: {x: 0.925, y: 2.725, z: 0.29}
-  m_MoveThreshold: 0.1
-  m_Carve: 1
-  m_CarveOnlyStationary: 0
-  m_Center: {x: -0.03, y: -1.82, z: -0.02}
-  m_TimeToStationary: 0.5
 --- !u!1 &9125612139522583024
 GameObject:
   m_ObjectHideFlags: 0

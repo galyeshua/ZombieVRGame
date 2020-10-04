@@ -11,7 +11,8 @@ public class Enemy : MonoBehaviour
 
     private float m_currSpeed = 0f;
     private float m_maxSpeed = 1f;
-    [SerializeField] private float m_speed = 0.005f;
+    [SerializeField] private float m_speed = 0.001f;
+    private float m_speed_by_level;
     [SerializeField] private float m_lifes = 100f;
 
     [SerializeField] private float m_hitPower = 10f;
@@ -34,6 +35,7 @@ public class Enemy : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         m_ZombieController.SetFloat("Speed", m_currSpeed);
         m_nav_agent.SetDestination(Vector3.zero);
+        m_speed_by_level = m_speed;
     }
 
     // Update is called once per frame
@@ -44,7 +46,6 @@ public class Enemy : MonoBehaviour
             // zombie is alive and didnt hit player, keep moving
             if (isTouchPlayer == false)
                 keepGoToPlayer();
-
 
             if (m_lifes <= 0)
             {
@@ -88,20 +89,23 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    public void add_level_speed(float level)
+    {
+        m_speed_by_level = m_speed + (level / 5000);
+        //Debug.Log(m_speed_by_level);
+    }
 
     private void keepGoToPlayer()
     {
-
         // inc speed to max speed
         if (m_currSpeed < m_maxSpeed)
         {
             m_nav_agent.speed = m_currSpeed;
-            m_currSpeed += m_speed;
+            m_currSpeed += m_speed_by_level;
             m_ZombieController.SetFloat("Speed", m_currSpeed);
         }
 
         // move Zombie
-        //transform.position += transform.forward * m_currSpeed / 10f;
+        transform.position += transform.forward * m_currSpeed / 10f;
     }
-
 }

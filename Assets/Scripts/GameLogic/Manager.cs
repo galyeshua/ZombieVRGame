@@ -37,8 +37,8 @@ public class Manager : MonoBehaviour
         yield return new WaitForSeconds(2.5f);
         levelText.gameObject.SetActive(false);
 
-        float numOfZombiesEasy = (int)((2 * level) + 1);
-        float numOfZombiesHard = (int)((numOfZombiesEasy / 3) + (level / 2));
+        float numOfZombiesEasy = (int)(2 * level);
+        float numOfZombiesHard = (int)(((numOfZombiesEasy + 1) / 3) + (level / 2));
 
         totalNumOfZombies = numOfZombiesEasy + numOfZombiesHard;
 
@@ -49,13 +49,13 @@ public class Manager : MonoBehaviour
 
         for (int i = 0; i < numOfZombiesEasy; i++)
         {
-            createZombie(Random.Range(40f, 50f), m_zombieEasyRef);
+            createZombie(Random.Range(40f, 55f), m_zombieEasyRef, level);
             yield return new WaitForSeconds(Random.Range(0.3f, 1f));
         }
 
         for (int i = 0; i < numOfZombiesHard; i++)
         {
-            createZombie(Random.Range(40f, 50f), m_zombieHardRef);
+            createZombie(Random.Range(40f, 60f), m_zombieHardRef, level);
             yield return new WaitForSeconds(Random.Range(0.6f, 1.5f));
         }
 
@@ -124,10 +124,11 @@ public class Manager : MonoBehaviour
     }
 
 
-    private void createZombie(float distance, GameObject zombie_ref)
+    private void createZombie(float distance, GameObject zombie_ref, float level)
     {
         GameObject enemy = Instantiate(zombie_ref, RandomPointOnCircleEdge(distance), Quaternion.identity);
         enemy.transform.LookAt(Vector3.zero);
+        enemy.GetComponent<Enemy>().add_level_speed(level);
     }
 
     private Vector3 RandomPointOnCircleEdge(float radius)
