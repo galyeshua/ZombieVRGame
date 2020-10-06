@@ -67,6 +67,7 @@ public class Enemy : MonoBehaviour
             transform.LookAt(Vector3.zero);
             GetComponentInChildren<Animator>().SetTrigger("isTouchPlayer");
             StartCoroutine("attackPlayer", collision.transform);
+            GetComponent<NavMeshAgent>().enabled = false;
         }
     }
 
@@ -106,6 +107,6 @@ public class Enemy : MonoBehaviour
         }
 
         // move Zombie
-        transform.position += transform.forward * m_currSpeed / 10f;
+        //transform.position += transform.forward * m_currSpeed / 10f;
     }
 }
