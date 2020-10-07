@@ -32,11 +32,11 @@ public class SimpleShoot : MonoBehaviour
 
     void ShootBullet()
     {
-        GameObject tempBullet = Instantiate(bulletPrefab, barrelLocation.position, barrelLocation.rotation);
-        tempBullet.GetComponent<Rigidbody>().AddForce(barrelLocation.forward * shotPower);
+        //GameObject tempBullet = Instantiate(bulletPrefab, barrelLocation.position, barrelLocation.rotation);
+        //tempBullet.GetComponent<Rigidbody>().AddForce(barrelLocation.forward * shotPower);
         GameObject tempFlash = Instantiate(muzzleFlashPrefab, barrelLocation.position, barrelLocation.rotation);
         Destroy(tempFlash, 0.5f);
-        Destroy(tempBullet, 5f);
+        //Destroy(tempBullet, 5f);
     }
 
 }

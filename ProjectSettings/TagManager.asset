@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Bullet
   - Magazine
+  - AmmoBox
+  - Enemy
+  - UIButton
   layers:
   - Default
   - TransparentFX

@@ -10,7 +10,7 @@ public class Enemy : MonoBehaviour
     private bool isAlive = true;
 
     private float m_currSpeed = 0f;
-    private float m_maxSpeed = 1f;
+    private float m_maxSpeed = 10f;
     [SerializeField] private float m_speed = 0.001f;
     private float m_speed_by_level;
     [SerializeField] private float m_lifes = 100f;
@@ -23,18 +23,23 @@ public class Enemy : MonoBehaviour
     [SerializeField] private AudioSource m_hitted_sound;
     [SerializeField] private AudioSource m_die_sound;
 
+    private GameObject player;
+
     [SerializeField] private NavMeshAgent m_nav_agent;
 
-
     private Manager manager;
+
+    private Vector3 gunLoc = new Vector3(0.7f, -0.6f, 1f);
 
     // Start is called before the first frame update
     void Start()
     {
+        player = GameObject.Find("Player");
         manager = GameObject.Find("GameManager").GetComponent<Manager>();
         rb = GetComponent<Rigidbody>();
         m_ZombieController.SetFloat("Speed", m_currSpeed);
-        m_nav_agent.SetDestination(Vector3.zero);
+        m_nav_agent.SetDestination(gunLoc);
+        //m_nav_agent.SetDestination(Vector3.zero);
         m_speed_by_level = m_speed;
     }
 
@@ -43,30 +48,54 @@ public class Enemy : MonoBehaviour
     {
         if (isAlive)
         {
-            // zombie is alive and didnt hit player, keep moving
+            //float dist = Vector3.Distance(gunLoc, transform.position);
+
+            //// zombie is alive and didnt hit player, keep moving
             if (isTouchPlayer == false)
+            //{
                 keepGoToPlayer();
 
+            //    if (dist < 5)
+            //    {
+            //        // Zombie hit player, start to attack
+            //        isTouchPlayer = true;
+            //        transform.LookAt(Vector3.zero);
+            //        GetComponentInChildren<Animator>().SetTrigger("isTouchPlayer");
+            //        StartCoroutine("attackPlayer", player.transform);
+            //        GetComponent<NavMeshAgent>().enabled = false;
+            //    }
+            //}   
+
+            //if (isTouchPlayer)
+            //    isTouchPlayer = false;
+            
+
             if (m_lifes <= 0)
-            {
-                m_die_sound.Play();
-                GetComponentInChildren<Animator>().SetTrigger("isDead");
-                isAlive = false;
-                manager.decNumOfZombies();
-                Destroy(this.gameObject, 5);
-            }
+                die();
         }
+    }
+
+    private void die()
+    {
+        m_die_sound.Play();
+        GetComponent<NavMeshAgent>().enabled = false;
+        GetComponentInChildren<Animator>().SetTrigger("isDead");
+        isAlive = false;
+        manager.decNumOfZombies();
+        Destroy(this.gameObject, 5);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.transform.GetComponent<Player>() != null)
+        
+        if (collision.transform.name == "PlayerArea")
+        //if (collision.transform.GetComponent<Player>() != null)
         {
             // Zombie hit player, start to attack
             isTouchPlayer = true;
             transform.LookAt(Vector3.zero);
             GetComponentInChildren<Animator>().SetTrigger("isTouchPlayer");
-            StartCoroutine("attackPlayer", collision.transform);
+            StartCoroutine("attackPlayer", player.transform);
             GetComponent<NavMeshAgent>().enabled = false;
         }
     }
@@ -93,7 +122,6 @@ public class Enemy : MonoBehaviour
     public void add_level_speed(float level)
     {
         m_speed_by_level = m_speed + (level / 5000);
-        //Debug.Log(m_speed_by_level);
     }
 
     private void keepGoToPlayer()

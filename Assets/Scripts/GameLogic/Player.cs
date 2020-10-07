@@ -17,6 +17,8 @@ public class Player : MonoBehaviour
     [SerializeField] private AudioSource m_shoot_sound;
     [SerializeField] private AudioSource m_reload_ammo_sound;
 
+    [SerializeField] float m_maxBulletHit = 34f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -39,42 +41,67 @@ public class Player : MonoBehaviour
         if (Input.anyKeyDown)
         {
             bool playerCanShoot = true;
+            Transform enemy = null;
             RaycastHit m_hit;
-            Ray m_ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f));
+
+            Ray m_ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f)); // for pc
+            //Ray m_ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 4f, Screen.height / 2f, 0f)); // for phone
+
+            Vector3 forward = transform.TransformDirection(Vector3.forward) * 10;
+            Debug.DrawRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), forward, Color.green);
 
             //check if player hit EXIT or RELOAD buttons
             if (Physics.Raycast(m_ray, out m_hit))
             {
                 if (m_hit.rigidbody != null)
                 {
-                    switch (m_hit.transform.name)
+                    switch (m_hit.transform.tag)
                     {
-                        case "Reload":
+                        case "AmmoBox":
+                            //Reload
+                            Debug.Log("Reload");
                             playerCanShoot = false;
                             cangeAmmoCount(numOfBulletsPerLoad);
                             break;
 
-                        case "Exit":
-                            playerCanShoot = false;
-                            //Exit Game
+                        case "Enemy":
+                            //enemy hitted
+                            Debug.Log("Enemy");
+                            enemy = m_hit.transform;
                             break;
+
+                        case "UIButton":
+                            //check button
+                            playerCanShoot = false;
+                            Debug.Log("UIButton");
+
+                            if (m_hit.transform.name == "Exit")
+                            {
+                                Debug.Log("Exit");
+                                // Exit Game
+                            }
+                            break;
+
                     }
                 }
             }
 
             if (playerCanShoot)
-                Shoot();
+                Shoot(enemy);
         }
     }
 
 
-    private void Shoot()
+    private void Shoot(Transform hit)
     {
         if (currNumOfBullets > 0)
         {
             m_shoot_sound.Play();
             gun.Shoot();
             cangeAmmoCount(currNumOfBullets - 1); // dec ammo count by 1
+
+            if (hit != null && hit.GetComponent<Enemy>() != null)
+                hit.GetComponent<Enemy>().hitByBullet(m_maxBulletHit);
         }
         else
         {

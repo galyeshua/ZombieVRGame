@@ -75,45 +75,7 @@ public class Manager : MonoBehaviour
     {
         totalNumOfZombies -= 1;
     }
-
-    //private void startNewLevel()
-    //{
-    //    //while(keepPlay)
-    //    //{
-    //        keepPlay = false;
-    //        StartCoroutine("showLevelText");
-    //        keepPlay = true;
-    //        StartCoroutine("createEnemies");
-    //        level += 1;
-    //    //}
-    //}
-
-
-    //IEnumerator createEnemies()
-    //{
-    //    float numOfZombiesEasy = (int)((2 * level) + 1);
-    //    float numOfZombiesHard = (int)((numOfZombiesEasy / 3) + (level / 2));
-
-    //    Debug.Log("Easy: " + numOfZombiesEasy);
-    //    Debug.Log("Hard: " + numOfZombiesHard);
-
-    //    yield return new WaitForSeconds(0.5f);
-
-    //    for (int i=0; i< numOfZombiesEasy; i++)
-    //    {
-    //        createZombie(Random.Range(40f, 50f), m_zombieEasyRef);
-    //        yield return new WaitForSeconds(Random.Range(0.1f, 0.7f));
-    //    }
-
-    //    for (int i = 0; i < numOfZombiesHard; i++)
-    //    {
-    //        createZombie(Random.Range(40f, 50f), m_zombieHardRef);
-    //        yield return new WaitForSeconds(Random.Range(0.1f, 0.7f));
-    //    }
-
-    //}
-
-
+   
     public void gameOver()
     {
         //keepPlay = false;
@@ -122,7 +84,6 @@ public class Manager : MonoBehaviour
         //gameOverPanel.SetActive(true);
         //topInfoPanel.SetActive(false);
     }
-
 
     private void createZombie(float distance, GameObject zombie_ref, float level)
     {
