@@ -75,7 +75,11 @@ public class Manager : MonoBehaviour
         }
 
         // add bonus lifes to the player
-        StartCoroutine(UIManager.addBonusLife(m_player_lifes, 5f));
+        if (m_player_lifes <= 95)
+        {
+            StartCoroutine(UIManager.addBonusLife(m_player_lifes, 5f));
+            m_player_lifes += 5;
+        }  
 
         level += 1; // inc level
         StartCoroutine("createEnemies"); // next level

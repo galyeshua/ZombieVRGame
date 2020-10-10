@@ -24,13 +24,13 @@ public class GameUIManager : MonoBehaviour
 
     void Start()
     {
-        m_fpsText.gameObject.SetActive(true);
+        //m_fpsText.gameObject.SetActive(true);
     }
 
     // Update is called once per frame
     void Update()
     {
-        showFPS();
+        //showFPS();
     }
 
     private void showFPS()
@@ -126,13 +126,9 @@ public class GameUIManager : MonoBehaviour
 
     public IEnumerator addBonusLife(float currentLifePoints, float addValue)
     {
-        if (currentLifePoints <= 95)
-        {
-            m_lifeAddText.gameObject.SetActive(true);
-            currentLifePoints += addValue;
-            updateLifeText(currentLifePoints + addValue);
-            yield return new WaitForSeconds(2.5f);
-        }
+        m_lifeAddText.gameObject.SetActive(true);
+        updateLifeText(currentLifePoints + addValue);
+        yield return new WaitForSeconds(2.5f);
         m_lifeAddText.gameObject.SetActive(false);
     }
 }
