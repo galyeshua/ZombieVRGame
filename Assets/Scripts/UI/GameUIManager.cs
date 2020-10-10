@@ -129,8 +129,8 @@ public class GameUIManager : MonoBehaviour
         if (currentLifePoints <= 95)
         {
             m_lifeAddText.gameObject.SetActive(true);
-            currentLifePoints += 5;
-            updateLifeText(currentLifePoints + 5);
+            currentLifePoints += addValue;
+            updateLifeText(currentLifePoints + addValue);
             yield return new WaitForSeconds(2.5f);
         }
         m_lifeAddText.gameObject.SetActive(false);

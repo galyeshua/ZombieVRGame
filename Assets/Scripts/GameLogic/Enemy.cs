@@ -114,7 +114,7 @@ public class Enemy : MonoBehaviour
 
         m_hitted_sound.Play();
 
-        Debug.Log("HIT! rest: " + m_life_points);
+        //Debug.Log("HIT! rest: " + m_life_points);
     }
 
 
