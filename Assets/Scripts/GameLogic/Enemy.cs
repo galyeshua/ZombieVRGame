@@ -1,46 +1,34 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+
 public class Enemy : MonoBehaviour
 {
-    Rigidbody rb;
-    private bool isTouchPlayer = false;
+    private Manager manager;
+
+    private bool attackMode = false;
     private bool isAlive = true;
 
-    private float m_currSpeed = 0f;
+    private float m_currSpeed = 0.45f;
     private float m_maxSpeed = 10f;
+
     [SerializeField] private float m_speed = 0.001f;
-    private float m_speed_by_level;
-    [SerializeField] private float m_lifes = 100f;
-
+    [SerializeField] private float m_life_points = 2f;
     [SerializeField] private float m_hitPower = 10f;
-
     [SerializeField] private Animator m_ZombieController;
-
     [SerializeField] private AudioSource m_attack_sound;
     [SerializeField] private AudioSource m_hitted_sound;
     [SerializeField] private AudioSource m_die_sound;
-
-    private GameObject player;
-
     [SerializeField] private NavMeshAgent m_nav_agent;
 
-    private Manager manager;
-
-    private Vector3 gunLoc = new Vector3(0.7f, -0.6f, 1f);
 
     // Start is called before the first frame update
     void Start()
     {
-        player = GameObject.Find("Player");
         manager = GameObject.Find("GameManager").GetComponent<Manager>();
-        rb = GetComponent<Rigidbody>();
-        m_ZombieController.SetFloat("Speed", m_currSpeed);
-        m_nav_agent.SetDestination(gunLoc);
-        //m_nav_agent.SetDestination(Vector3.zero);
-        m_speed_by_level = m_speed;
+        m_nav_agent.SetDestination(Vector3.zero);
+        setSpeed(m_currSpeed);
     }
 
     // Update is called once per frame
@@ -48,93 +36,91 @@ public class Enemy : MonoBehaviour
     {
         if (isAlive)
         {
-            //float dist = Vector3.Distance(gunLoc, transform.position);
-
-            //// zombie is alive and didnt hit player, keep moving
-            if (isTouchPlayer == false)
-            //{
+            // zombie is alive and didnt hit player, keep moving
+            if (attackMode == false)
                 keepGoToPlayer();
 
-            //    if (dist < 5)
-            //    {
-            //        // Zombie hit player, start to attack
-            //        isTouchPlayer = true;
-            //        transform.LookAt(Vector3.zero);
-            //        GetComponentInChildren<Animator>().SetTrigger("isTouchPlayer");
-            //        StartCoroutine("attackPlayer", player.transform);
-            //        GetComponent<NavMeshAgent>().enabled = false;
-            //    }
-            //}   
-
-            //if (isTouchPlayer)
-            //    isTouchPlayer = false;
-            
-
-            if (m_lifes <= 0)
+            if (m_life_points <= 0)
                 die();
         }
     }
 
-    private void die()
+    private void setSpeed(float speed)
     {
-        m_die_sound.Play();
-        GetComponent<NavMeshAgent>().enabled = false;
-        GetComponentInChildren<Animator>().SetTrigger("isDead");
-        isAlive = false;
-        manager.decNumOfZombies();
-        Destroy(this.gameObject, 5);
+        // set new speed for animation and navmash agent
+        m_currSpeed = speed;
+        m_nav_agent.speed = speed + 0.5f;
+        m_ZombieController.SetFloat("Speed", speed);
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        
-        if (collision.transform.name == "PlayerArea")
-        //if (collision.transform.GetComponent<Player>() != null)
-        {
-            // Zombie hit player, start to attack
-            isTouchPlayer = true;
-            transform.LookAt(Vector3.zero);
-            GetComponentInChildren<Animator>().SetTrigger("isTouchPlayer");
-            StartCoroutine("attackPlayer", player.transform);
-            GetComponent<NavMeshAgent>().enabled = false;
-        }
-    }
-
-    public void hitByBullet(float maxHit)
-    {
-        // Zombie hitted by bullet, dec life points
-        m_hitted_sound.Play();
-        float dist = Vector3.Distance(Vector3.zero, transform.position);
-        float hitPower = Mathf.Abs(maxHit - dist);
-        m_lifes -= hitPower;
-    }
-
-    IEnumerator attackPlayer(Transform player)
-    {
-        while(isAlive)
-        {
-            m_attack_sound.Play();
-            player.GetComponent<Player>().hitByZombie(m_hitPower);
-            yield return new WaitForSeconds(1.3f);
-        }
-    }
-
-    public void add_level_speed(float level)
-    {
-        m_speed_by_level = m_speed + (level / 5000);
-    }
 
     private void keepGoToPlayer()
     {
-        // inc speed to max speed
-        if (m_currSpeed < m_maxSpeed)
-        {
-            m_nav_agent.speed = m_currSpeed;
-            m_currSpeed += m_speed_by_level;
-            m_ZombieController.SetFloat("Speed", m_currSpeed);
-        }
+        // dest of zombie from player (camera)
+        float dist = Vector3.Distance(Vector3.zero, transform.position); 
 
-        // move Zombie
-        //transform.position += transform.forward * m_currSpeed / 10f;
+        // if zombie is close to player start inc the speed
+        if (dist <= 40)
+        {
+            if (m_currSpeed < m_maxSpeed)
+                setSpeed(m_currSpeed + m_speed);
+        }
+    }
+
+
+    private void die()
+    {
+        m_die_sound.Play();
+        GetComponent<NavMeshAgent>().ResetPath(); // stop agent movement
+        GetComponentInChildren<Animator>().SetTrigger("isDead"); // play die animation
+        isAlive = false;
+        manager.decNumOfZombies(); // update the manager to dec num of zombies
+        Destroy(this.gameObject, 5);
+    }
+
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        // if zombie enter to PlayerArea start attack
+        if (collision.transform.name == "PlayerArea")
+            StartCoroutine("attackPlayer");
+    }
+
+
+    IEnumerator attackPlayer()
+    {
+        // zombie is attacking
+        GetComponentInChildren<Animator>().SetTrigger("Attack");
+        attackMode = true;
+        GetComponent<NavMeshAgent>().ResetPath(); // stop agent movement
+        transform.LookAt(Vector3.zero); // look at camera
+
+        // while zombie is alive hit player every 1.6 seconds
+        while (isAlive)
+        {
+            m_attack_sound.Play();
+            manager.playerHittedByZombie(m_hitPower);
+            yield return new WaitForSeconds(1.6f);
+        }
+    }
+
+
+    public void hitted()
+    {
+        // Zombie hitted, dec life points
+
+        if (isAlive)
+            m_life_points -= 1;
+
+        m_hitted_sound.Play();
+
+        Debug.Log("HIT! rest: " + m_life_points);
+    }
+
+
+    public void incSpeedByLevel(float level)
+    {
+        //increases zombie speed by level to increase difficulty level
+        setSpeed(m_currSpeed + (level / 500));
     }
 }

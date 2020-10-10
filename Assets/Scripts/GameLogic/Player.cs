@@ -1,132 +1,71 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
+
 
 public class Player : MonoBehaviour
 {
-    SimpleShoot gun;
-    private float m_lifes = 100f;
-    [SerializeField] private Text m_lifeText;
-    [SerializeField] private Text m_ammoText;
-    [SerializeField] private float numOfBulletsPerLoad = 7f;
-    private float currNumOfBullets;
-    private Manager manager;
+    //private Manager manager;
+    private GameUIManager UIManager;
 
-    [SerializeField] private AudioSource m_no_ammo_sound;
-    [SerializeField] private AudioSource m_shoot_sound;
-    [SerializeField] private AudioSource m_reload_ammo_sound;
-
-    [SerializeField] float m_maxBulletHit = 34f;
+    private Gun gun;
+    RaycastHit m_hit;
+    Ray m_ray;
 
     // Start is called before the first frame update
     void Start()
     {
-        manager = GameObject.Find("GameManager").GetComponent<Manager>();
-        gun = GetComponentInChildren<SimpleShoot>();
-        cangeAmmoCount(numOfBulletsPerLoad);
+        UIManager = GameObject.Find("GameManager").GetComponent<GameUIManager>();
+
+        gun = GetComponentInChildren<Gun>();
     }
 
     // Update is called once per frame
     void Update()
     {
         checkInputs();
-
-        if (m_lifes < 0)
-            manager.gameOver();
     }
 
     private void checkInputs()
     {
         if (Input.anyKeyDown)
         {
-            bool playerCanShoot = true;
+            bool playerCanShoot = true; // bool for disable shooting spesific objects
             Transform enemy = null;
-            RaycastHit m_hit;
+            Transform camTrans = Camera.main.transform;
 
-            Ray m_ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f)); // for pc
-            //Ray m_ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 4f, Screen.height / 2f, 0f)); // for phone
+            m_ray = new Ray(camTrans.position, camTrans.forward);
 
-            Vector3 forward = transform.TransformDirection(Vector3.forward) * 10;
-            Debug.DrawRay(new Vector3(Screen.width / 2f, Screen.height / 2f, 0f), forward, Color.green);
+            var RaycastRes = Physics.Raycast(m_ray, out m_hit);
+            Debug.DrawRay(camTrans.position, camTrans.forward * 10, RaycastRes ? Color.green : Color.red, 5f);
 
-            //check if player hit EXIT or RELOAD buttons
-            if (Physics.Raycast(m_ray, out m_hit))
+            if (RaycastRes)
             {
+                // check if hit have rigidbody
                 if (m_hit.rigidbody != null)
                 {
+                    // Identify hit object by his tag
                     switch (m_hit.transform.tag)
                     {
-                        case "AmmoBox":
-                            //Reload
-                            Debug.Log("Reload");
+                        case "AmmoBox":  //hit AmmoBox - Reload
                             playerCanShoot = false;
-                            cangeAmmoCount(numOfBulletsPerLoad);
+                            gun.StartCoroutine("Reload"); // call reload in gun
                             break;
 
-                        case "Enemy":
-                            //enemy hitted
-                            Debug.Log("Enemy");
-                            enemy = m_hit.transform;
-                            break;
-
-                        case "UIButton":
-                            //check button
+                        case "UIButton": //hit button, manager will handle it
                             playerCanShoot = false;
-                            Debug.Log("UIButton");
-
-                            if (m_hit.transform.name == "Exit")
-                            {
-                                Debug.Log("Exit");
-                                // Exit Game
-                            }
+                            UIManager.handle_button(m_hit.transform.name);
                             break;
 
+                        case "Enemy":   //hit enemy - save it for shooting
+                            enemy = m_hit.transform; 
+                            break;
                     }
                 }
             }
 
-            if (playerCanShoot)
-                Shoot(enemy);
+            // if playerCanShoot is still true, call shoot in gun and pass enemy
+            if (playerCanShoot) 
+                StartCoroutine(gun.Shoot(enemy)); 
         }
     }
-
-
-    private void Shoot(Transform hit)
-    {
-        if (currNumOfBullets > 0)
-        {
-            m_shoot_sound.Play();
-            gun.Shoot();
-            cangeAmmoCount(currNumOfBullets - 1); // dec ammo count by 1
-
-            if (hit != null && hit.GetComponent<Enemy>() != null)
-                hit.GetComponent<Enemy>().hitByBullet(m_maxBulletHit);
-        }
-        else
-        {
-            m_no_ammo_sound.Play();
-        }
-    }
-
-    private void cangeAmmoCount(float n)
-    {
-        // if n is full ammo amount start reload animation
-        if(n == numOfBulletsPerLoad)
-        {
-            //m_reload_ammo_sound.Play();
-            gun.Reload();
-        }
-
-        currNumOfBullets = n;
-        m_ammoText.text = "" + currNumOfBullets;
-    }
-
-    public void hitByZombie(float hitPower)
-    {
-        m_lifes -= hitPower;
-        m_lifeText.text = "" + (int)m_lifes;
-    }
-
 
 }

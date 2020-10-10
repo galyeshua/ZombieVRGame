@@ -1018,7 +1018,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 114
+  m_Constraints: 118
   m_CollisionDetection: 0
 --- !u!114 &6792818181423499506
 MonoBehaviour:
@@ -1033,8 +1033,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_speed: 0.004
-  m_lifes: 100
-  m_hitPower: 7
+  m_life_points: 4
+  m_hitPower: 6
   m_ZombieController: {fileID: 9125612140780351580}
   m_attack_sound: {fileID: -7814368458035519924}
   m_hitted_sound: {fileID: 1254187548308185732}
@@ -1192,7 +1192,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 0.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1288,7 +1288,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 0.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1384,7 +1384,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 0.5
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1438,9 +1438,9 @@ NavMeshAgent:
   m_Acceleration: 25
   avoidancePriority: 50
   m_AngularSpeed: 100
-  m_StoppingDistance: 0
+  m_StoppingDistance: 2
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 0
+  m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 5.5
   m_BaseOffset: 4.53
